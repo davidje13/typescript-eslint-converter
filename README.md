@@ -12,7 +12,7 @@ such as airbnb easily. See below for full details.
 This assumes you have already installed and configured eslint.
 
 ```bash
-npm install --save-dev git+https://github.com/davidje13/typescript-eslint-convert#semver:^1.0.0
+npm install --save-dev typescript-eslint-converter
 ```
 
 Change your `.eslintrc.js`:
