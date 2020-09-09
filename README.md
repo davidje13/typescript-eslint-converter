@@ -52,7 +52,7 @@ module.exports = typescriptEslintConverter({
 ## Automatic rule conversion
 
 Several rules are automatically converted. If you believe another rule should be automatically converted, please
-[raise an issue](https://github.com/davidje13/typescript-eslint-convert/issues).
+[raise an issue](https://github.com/davidje13/typescript-eslint-converter/issues).
 
 All conversions only apply if an equivalent explicit configuration is not found.
 
