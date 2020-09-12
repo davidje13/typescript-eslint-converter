@@ -75,6 +75,8 @@ const getTypescriptRules = ({ indent }) => ({
   'no-extra-parens': '@typescript-eslint/no-extra-parens',
   'no-extra-semi': '@typescript-eslint/no-extra-semi',
   'no-magic-numbers': '@typescript-eslint/no-magic-numbers', // note: ts version has additional config options
+  'no-redeclare': '@typescript-eslint/no-redeclare',
+  'no-shadow': '@typescript-eslint/no-shadow',
   'no-unused-expressions': '@typescript-eslint/no-unused-expressions',
   'babel/no-unused-expressions': '@typescript-eslint/no-unused-expressions',
   'no-unused-vars': '@typescript-eslint/no-unused-vars', // https://github.com/typescript-eslint/typescript-eslint/issues/1856
