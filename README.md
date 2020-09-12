@@ -144,25 +144,36 @@ These rule changes only apply to `.ts` and `.tsx` source files:
   - `brace-style` &rarr; `@typescript-eslint/brace-style`
   - `comma-spacing` &rarr; `@typescript-eslint/comma-spacing`
   - `default-param-last` &rarr; `@typescript-eslint/default-param-last`
+  - `dot-notation` &rarr; `@typescript-eslint/dot-notation`
+    - The TypeScript rule offers [additional configuration options](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/dot-notation.md)
   - `func-call-spacing` &rarr; `@typescript-eslint/func-call-spacing`
+  - `init-declarations` &rarr; `@typescript-eslint/init-declarations`
+  - `keyword-spacing` &rarr; `@typescript-eslint/keyword-spacing`
+  - `lines-between-class-members` &rarr; `@typescript-eslint/lines-between-class-members`
+    - The TypeScript rule offers [additional configuration options](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/lines-between-class-members.md)
   - `no-array-constructor` &rarr; `@typescript-eslint/no-array-constructor`
   - `no-dupe-class-members` &rarr; `@typescript-eslint/no-dupe-class-members`
   - `no-empty-function` &rarr; `@typescript-eslint/no-empty-function`
   - `no-extra-parens` &rarr; `@typescript-eslint/no-extra-parens`
   - `no-extra-semi` &rarr; `@typescript-eslint/no-extra-semi`
+  - `no-invalid-this` &rarr; `@typescript-eslint/no-invalid-this`
+  - `no-loop-func` &rarr; `@typescript-eslint/no-loop-func`
+  - `no-loss-of-precision` &rarr; `@typescript-eslint/no-loss-of-precision`
   - `no-magic-numbers` &rarr; `@typescript-eslint/no-magic-numbers`
-    - The TypeScript rule offers additional configuration options
+    - The TypeScript rule offers [additional configuration options](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-magic-numbers.md)
+  - `no-redeclare` &rarr; `@typescript-eslint/no-redeclare`
+    - The TypeScript rule offers [additional configuration options](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-redeclare.md)
+  - `no-shadow` &rarr; `@typescript-eslint/no-shadow`
+    - The TypeScript rule offers [additional configuration options](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-shadow.md)
   - `no-unused-expressions` &amp; `babel/no-unused-expressions` &rarr; `@typescript-eslint/no-unused-expressions`
   - `no-unused-vars` &rarr; `@typescript-eslint/no-unused-vars`
-    - See [typescript-eslint#1856](https://github.com/typescript-eslint/typescript-eslint/issues/1856) for potential issues
   - `no-use-before-define` &rarr; `@typescript-eslint/no-use-before-define`
-    - The TypeScript rule offers additional configuration options
-    - See [typescript-eslint#1856](https://github.com/typescript-eslint/typescript-eslint/issues/1856) for potential issues
+    - The TypeScript rule offers [additional configuration options](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-use-before-define.md)
   - `no-useless-constructor` &rarr; `@typescript-eslint/no-useless-constructor`
   - `quotes` &amp; `babel/quotes` &rarr; `@typescript-eslint/quotes`
   - `require-await` &rarr; `@typescript-eslint/require-await`
   - `no-return-await` &rarr; `@typescript-eslint/return-await`
-    - The TypeScript rule offers additional configuration options
+    - The TypeScript rule offers [additional configuration options](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/return-await.md)
     - The default `in-try-catch` matches `no-return-await`'s behaviour
   - `semi` &amp; `babel/semi` &rarr; `@typescript-eslint/semi`
   - `space-before-function-paren` &rarr; `@typescript-eslint/space-before-function-paren`
