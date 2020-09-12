@@ -44,6 +44,11 @@ it('adds typescript-eslint/recommended', () => {
   ]);
 });
 
+it('does not add typescript-eslint/recommended if recommended is false', () => {
+  const converted = typescriptEslintConverter(BASE_OPTS, { recommended: false });
+  expect.equal(converted.baseConfig.extends, []);
+});
+
 it('preserves existing config extensions', () => {
   const converted = typescriptEslintConverter({
     ...BASE_OPTS,
@@ -235,4 +240,63 @@ it('leaves typescript rules unchanged if configured', () => {
   expect.equal(getRuleConfig(converted, 'foo.js', 'brace-style'), ['warn', 'stroustrup']);
   expect.equal(getRuleConfig(converted, 'foo.ts', 'brace-style')[0], 'off');
   expect.equal(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/brace-style'), ['error']);
+});
+
+it('disables indent by default', () => {
+  const converted = typescriptEslintConverter({
+    ...BASE_OPTS,
+    baseConfig: {
+      rules: {
+        'indent': ['error', 2],
+      },
+    },
+  });
+
+  expect.equal(getRuleConfig(converted, 'foo.js', 'indent'), ['error', 2]);
+  expect.equal(getRuleConfig(converted, 'foo.js', '@typescript-eslint/indent'), []);
+
+  expect.equal(getRuleConfig(converted, 'foo.ts', 'indent')[0], 'off');
+  expect.equal(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/indent'), []);
+});
+
+it('preserves existing @typescript-eslint/indent config', () => {
+  const converted = typescriptEslintConverter({
+    ...BASE_OPTS,
+    baseConfig: {
+      rules: {
+        'indent': ['error', 2],
+        '@typescript-eslint/indent': ['warn', 4],
+      },
+    },
+  });
+
+  expect.equal(getRuleConfig(converted, 'foo.ts', 'indent')[0], 'off');
+  expect.equal(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/indent'), ['warn', 4]);
+});
+
+it('converts indent if requested', () => {
+  const converted = typescriptEslintConverter({
+    ...BASE_OPTS,
+    baseConfig: {
+      rules: {
+        'indent': ['error', 2],
+      },
+    },
+  }, { indent: true });
+
+  expect.equal(getRuleConfig(converted, 'foo.js', 'indent'), ['error', 2]);
+  expect.equal(getRuleConfig(converted, 'foo.js', '@typescript-eslint/indent'), []);
+
+  expect.equal(getRuleConfig(converted, 'foo.ts', 'indent')[0], 'off');
+  expect.equal(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/indent'), ['error', 2]);
+});
+
+it('does not convert indent if not specified', () => {
+  const converted = typescriptEslintConverter(BASE_OPTS, { indent: true });
+
+  expect.equal(getRuleConfig(converted, 'foo.js', 'indent'), []);
+  expect.equal(getRuleConfig(converted, 'foo.js', '@typescript-eslint/indent'), []);
+
+  expect.equal(getRuleConfig(converted, 'foo.ts', 'indent'), []);
+  expect.equal(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/indent'), []);
 });

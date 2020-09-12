@@ -1,6 +1,6 @@
 const { CLIEngine } = require('eslint');
 const applyAdaptations = require('./applyAdaptations');
-const { BASE_RULES, TYPESCRIPT_RULES } = require('./adaptations');
+const { BASE_RULES, getTypescriptRules } = require('./adaptations');
 
 function makeOverride(cliEngine, glob, adaptations) {
   const globList = Array.isArray(glob) ? glob : [glob];
@@ -14,11 +14,11 @@ function makeOverride(cliEngine, glob, adaptations) {
 
 function addEntries(list, ...entries) {
   if (!list) {
-    return entries;
+    return entries.filter((e) => (e !== null));
   }
   const r = [...list];
   for (const entry of entries) {
-    if (!list.includes(entry)) {
+    if (entry !== null && !list.includes(entry)) {
       r.push(entry);
     }
   }
@@ -29,10 +29,14 @@ module.exports = (options, {
   typescriptFiles = ['*.ts', '*.tsx'],
   resolveExtensions = ['js', 'mjs', 'jsx', 'mjsx', 'ts', 'tsx'],
   autoParseResolvableExtensions = true,
+  recommended = true,
+  indent = false,
 } = {}) => {
   // CLIEngine is not recommended but still available in 7+
   // We support 5.x and 6.x, so cannot update to ESLint yet
   const cliEngine = new CLIEngine(options);
+
+  const typescriptRules = getTypescriptRules({ indent });
 
   const converted = {
     ...options,
@@ -46,7 +50,7 @@ module.exports = (options, {
       ...options.baseConfig,
       extends: addEntries(
         options.baseConfig?.extends,
-        'plugin:@typescript-eslint/recommended',
+        recommended ? 'plugin:@typescript-eslint/recommended' : null,
       ),
       settings: {
         ...options.baseConfig?.settings,
@@ -67,7 +71,7 @@ module.exports = (options, {
       },
       overrides: [
         ...options.baseConfig?.overrides || [],
-        ...typescriptFiles.map((glob) => makeOverride(cliEngine, glob, TYPESCRIPT_RULES)),
+        ...typescriptFiles.map((glob) => makeOverride(cliEngine, glob, typescriptRules)),
       ],
     },
   };

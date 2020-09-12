@@ -50,7 +50,7 @@ const BASE_RULES = {
   'import/extensions': (config) => config.map(copyObjJsToTs),
 };
 
-const TYPESCRIPT_RULES = {
+const getTypescriptRules = ({ indent }) => ({
   'getter-return': ['off'],
   'no-dupe-args': ['off'],
   'no-dupe-keys': ['off'],
@@ -68,7 +68,7 @@ const TYPESCRIPT_RULES = {
   'comma-spacing': '@typescript-eslint/comma-spacing',
   'default-param-last': '@typescript-eslint/default-param-last',
   'func-call-spacing': '@typescript-eslint/func-call-spacing',
-  'indent': ['off'], // require explicit opt-in due to https://github.com/typescript-eslint/typescript-eslint/issues/1824
+  'indent': indent ? '@typescript-eslint/indent' : ['off'], // require explicit opt-in due to https://github.com/typescript-eslint/typescript-eslint/issues/1824
   'no-array-constructor': '@typescript-eslint/no-array-constructor',
   'no-dupe-class-members': '@typescript-eslint/no-dupe-class-members',
   'no-empty-function': '@typescript-eslint/no-empty-function',
@@ -87,9 +87,9 @@ const TYPESCRIPT_RULES = {
   'semi': '@typescript-eslint/semi',
   'babel/semi': '@typescript-eslint/semi',
   'space-before-function-paren': '@typescript-eslint/space-before-function-paren',
-};
+});
 
 module.exports = {
   BASE_RULES,
-  TYPESCRIPT_RULES,
+  getTypescriptRules,
 };

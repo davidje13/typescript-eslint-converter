@@ -4,12 +4,12 @@ Automatic ESLint rule conversions for TypeScript.
 
 ESLint [replaces TSLint](https://eslint.org/blog/2019/01/future-typescript-eslint) for linting TypeScript.
 
-Existing JavaScript rules will be converted to support TypeScript, so you can combine this with base configurations
-such as airbnb easily. See below for full details.
+Existing JavaScript rules will be converted to support TypeScript, so you can combine this with base
+configurations such as airbnb easily. See below for full details.
 
 ## Installation
 
-This assumes you have already installed and configured eslint.
+This assumes you have already installed and configured ESLint.
 
 ```bash
 npm install --save-dev typescript-eslint-converter
@@ -21,11 +21,59 @@ Change your `.eslintrc.js`:
 const typescriptEslintConverter = require('typescript-eslint-converter');
 
 module.exports = typescriptEslintConverter({
-  /* existing configuration here */
+  /* existing configuration here; for example airbnb: */
+  extends: ['airbnb'],
 });
 ```
 
+This project is not limited to airbnb! You can use any ESLint configuration, and it will be converted
+to be TypeScript-compatible (see below for full details).
+
+Note that by default, `indent` is _not_ converted to `@typescript-eslint/indent` (due to
+[typescript-eslint#1824](https://github.com/typescript-eslint/typescript-eslint/issues/1824)).
+If you want to enable indentation linting despite the known issues, you can:
+
+```javascript
+const typescriptEslintConverter = require('typescript-eslint-converter');
+
+module.exports = typescriptEslintConverter({
+  /* existing configuration here */
+}, { indent: true });
+```
+
 ### Customisation
+
+#### Adding or customising TypeScript-specific rules
+
+The recommended way to add or customise TypeScript rules is with an `override`. This prevents
+ESLint attempting to apply the rules to Javascript files:
+
+```javascript
+const typescriptEslintConverter = require('typescript-eslint-converter');
+
+module.exports = typescriptEslintConverter({
+  extends: ['airbnb'], /* or whatever you are using */
+
+  baseConfig: {
+    overrides: [
+      {
+        files: ['*.ts', '*.tsx'],
+        rules: {
+          // examples:
+
+          // use airbnb quote rules for JS, but backticks for TS:
+          '@typescript-eslint/quotes': ['error', 'backtick'],
+
+          // TS-specific rule: enforce T[] rather than Array<T>
+          '@typescript-eslint/array-type': ['error', 'generic'],
+        },
+      }
+    ],
+  },
+});
+```
+
+#### Options
 
 By default, `ts` and `tsx` files will be handled as TypeScript. You can customise this if needed:
 
@@ -39,6 +87,8 @@ module.exports = typescriptEslintConverter({
   typescriptFiles: ['*.ts', '*.tsx'],
   resolveExtensions: ['js', 'mjs', 'jsx', 'mjsx', 'ts', 'tsx'],
   autoParseResolvableExtensions: true,
+  recommended: true,
+  indent: false,
 });
 ```
 
@@ -48,13 +98,15 @@ module.exports = typescriptEslintConverter({
   means matching files will be linted without needing to specify `--ext` on the CLI. If you do not want
   this behaviour, you can set it to `false` (all entries in `typescriptFiles` will continue to be linted
   automatically). Note that this feature only works with ESLint 7+.
+- `recommended` adds `'plugin:@typescript-eslint/recommended'` to the `baseConfig.extends` option.
+  If you do not want this, set it to `false`.
+- `indent` converts any existing `indent` rule to `@typescript-eslint/indent`. This is disabled by
+  default due to known issues with `@typescript-eslint/indent`.
 
 ## Automatic rule conversion
 
 Several rules are automatically converted. If you believe another rule should be automatically converted, please
 [raise an issue](https://github.com/davidje13/typescript-eslint-converter/issues).
-
-All conversions only apply if an equivalent explicit configuration is not found.
 
 ### Global rule changes
 
@@ -84,7 +136,7 @@ These rule changes only apply to `.ts` and `.tsx` source files:
   - `no-dupe-class-members`
   - `no-redeclare`
 
-* Convert native eslint and babel rules which [do not support TypeScript](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#extension-rules):
+* Convert native ESLint and babel rules which [do not support TypeScript](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#extension-rules):
   (any configuration is copied over; the TypeScript rules are config-compatible)
 
   - `brace-style` &rarr; `@typescript-eslint/brace-style`
@@ -115,4 +167,4 @@ These rule changes only apply to `.ts` and `.tsx` source files:
 
 * `indent`
   - This rule is disabled by default due to [typescript-eslint#1824](https://github.com/typescript-eslint/typescript-eslint/issues/1824).
-  - If you want to enable indentation linting, add an explicit `@typescript/indent` rule.
+  - If you want to enable indentation linting, use the `indent` option (described above).
