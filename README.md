@@ -21,7 +21,7 @@ Change your `.eslintrc.js`:
 const typescriptEslintConverter = require('typescript-eslint-converter');
 
 module.exports = typescriptEslintConverter({
-  /* existing configuration here; for example airbnb: */
+  // existing configuration here; for example airbnb:
   extends: ['airbnb'],
 });
 ```
@@ -37,13 +37,15 @@ If you want to enable indentation linting despite the known issues, you can:
 const typescriptEslintConverter = require('typescript-eslint-converter');
 
 module.exports = typescriptEslintConverter({
-  /* existing configuration here */
-}, { indent: true });
+  // existing configuration here
+}, {
+  indent: true, // enable indent -> @typescript-eslint/indent conversion
+});
 ```
 
-### Customisation
+## Customisation
 
-#### Adding or customising TypeScript-specific rules
+### Adding or customising TypeScript-specific rules
 
 The recommended way to add or customise TypeScript rules is with an `override`. This prevents
 ESLint attempting to apply the rules to Javascript files:
@@ -64,7 +66,7 @@ module.exports = typescriptEslintConverter({
           // use airbnb quote rules for JS, but backticks for TS:
           '@typescript-eslint/quotes': ['error', 'backtick'],
 
-          // TS-specific rule: enforce T[] rather than Array<T>
+          // TS-specific rule: enforce Array<T> rather than T[]
           '@typescript-eslint/array-type': ['error', 'generic'],
         },
       }
@@ -73,7 +75,7 @@ module.exports = typescriptEslintConverter({
 });
 ```
 
-#### Options
+### Options
 
 By default, `ts` and `tsx` files will be handled as TypeScript. You can customise this if needed:
 
