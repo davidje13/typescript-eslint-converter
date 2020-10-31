@@ -1,29 +1,22 @@
-stages:
-- test
-
 before_script:
 - npm install
 
 node:10:
   image: node:10
-  stage: test
   script:
   - npm test
 
 node:12:
   image: node:12
-  stage: test
   script:
   - npm test
 
 node:14:
   image: node:14
-  stage: test
   script:
   - npm test
 
 node:latest:
   image: node:latest
-  stage: test
   script:
   - npm test
