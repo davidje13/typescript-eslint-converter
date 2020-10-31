@@ -38,6 +38,12 @@ module.exports = (options, {
 
   const typescriptRules = getTypescriptRules({ indent });
 
+  // Support NodeJS <14 (no support for ?. syntax)
+  const baseConfig = options.baseConfig || {};
+  const settings = baseConfig.settings || {};
+  const importResolver = settings['import/resolver'] || {};
+  const importResolverNode = importResolver.node || {};
+
   const converted = {
     ...options,
     parser: '@typescript-eslint/parser',
@@ -47,30 +53,30 @@ module.exports = (options, {
     },
     plugins: addEntries(options.plugins, '@typescript-eslint'),
     baseConfig: {
-      ...options.baseConfig,
+      ...baseConfig,
       extends: addEntries(
-        options.baseConfig?.extends,
+        baseConfig.extends,
         recommended ? 'plugin:@typescript-eslint/recommended' : null,
       ),
       settings: {
-        ...options.baseConfig?.settings,
+        ...settings,
         'import/resolver': {
-          ...options.baseConfig?.settings?.['import/resolver'],
+          ...importResolver,
           node: {
-            ...options.baseConfig?.settings?.['import/resolver']?.node,
+            ...importResolverNode,
             extensions: addEntries(
-              options.baseConfig?.settings?.['import/resolver']?.node?.extensions,
+              importResolverNode.extensions,
               ...resolveExtensions.map((ext) => `.${ext}`)
             ),
           },
         },
       },
       rules: {
-        ...options.baseConfig?.rules,
+        ...baseConfig.rules,
         ...applyAdaptations(cliEngine.getConfigForFile('x').rules, BASE_RULES),
       },
       overrides: [
-        ...options.baseConfig?.overrides || [],
+        ...baseConfig.overrides || [],
         ...typescriptFiles.map((glob) => makeOverride(cliEngine, glob, typescriptRules)),
       ],
     },
