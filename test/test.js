@@ -4,7 +4,9 @@ const typescriptEslintConverter = require('../index');
 
 const BASE_OPTS = {
   parser: 'espree',
-  rules: {},
+  baseConfig: {
+    rules: {},
+  },
 };
 
 function getRuleConfig(options, filename, rule) {
@@ -42,6 +44,31 @@ it('adds typescript-eslint/recommended', () => {
   expect.equal(converted.baseConfig.extends, [
     'plugin:@typescript-eslint/recommended',
   ]);
+  expect.equal(converted.extends, undefined);
+});
+
+it('does not use baseConfig if not passed in', () => {
+  const converted = typescriptEslintConverter({ parser: 'espree' });
+  expect.equal(converted.extends, [
+    'plugin:@typescript-eslint/recommended',
+  ]);
+  expect.equal(converted.baseConfig, undefined);
+});
+
+it('does not use baseConfig if forced', () => {
+  const converted = typescriptEslintConverter(BASE_OPTS, { useLoaderStyle: false });
+  expect.equal(converted.extends, [
+    'plugin:@typescript-eslint/recommended',
+  ]);
+  expect.equal(converted.baseConfig, undefined);
+});
+
+it('does use baseConfig if forced', () => {
+  const converted = typescriptEslintConverter({ parser: 'espree' }, { useLoaderStyle: true });
+  expect.equal(converted.baseConfig.extends, [
+    'plugin:@typescript-eslint/recommended',
+  ]);
+  expect.equal(converted.extends, undefined);
 });
 
 it('does not add typescript-eslint/recommended if recommended is false', () => {

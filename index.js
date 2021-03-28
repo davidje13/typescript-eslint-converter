@@ -25,21 +25,30 @@ function addEntries(list, ...entries) {
   return r;
 }
 
+const GLOBAL_FLAG = 'typescriptEslintConverterRecur';
+
 module.exports = (options, {
   typescriptFiles = ['*.ts', '*.tsx'],
   resolveExtensions = ['js', 'mjs', 'jsx', 'mjsx', 'ts', 'tsx'],
   autoParseResolvableExtensions = true,
+  useLoaderStyle = null, // auto-detect by default
   recommended = true,
   indent = false,
 } = {}) => {
+  if (global[GLOBAL_FLAG]) {
+    // running eslint to get current config; avoid recursion
+    return options;
+  }
+
+  global[GLOBAL_FLAG] = true;
+
   // CLIEngine is not recommended but still available in 7+
   // We support 5.x and 6.x, so cannot update to ESLint yet
   const cliEngine = new CLIEngine(options);
 
   const typescriptRules = getTypescriptRules({ indent });
 
-  // Support NodeJS <14 (no support for ?. syntax)
-  const baseConfig = options.baseConfig || {};
+  const baseConfig = options.baseConfig || (useLoaderStyle === false ? {} : options);
   const settings = baseConfig.settings || {};
   const importResolver = settings['import/resolver'] || {};
   const importResolverNode = importResolver.node || {};
@@ -53,7 +62,7 @@ module.exports = (options, {
     },
     plugins: addEntries(options.plugins, '@typescript-eslint'),
     baseConfig: {
-      ...baseConfig,
+      ...(options.baseConfig || {}),
       extends: addEntries(
         baseConfig.extends,
         recommended ? 'plugin:@typescript-eslint/recommended' : null,
@@ -86,6 +95,14 @@ module.exports = (options, {
     converted.baseConfig.overrides.push(...resolveExtensions.map((ext) => ({
       files: [`*.${ext}`],
     })));
+  }
+
+  delete global[GLOBAL_FLAG];
+
+  if (useLoaderStyle === false || (useLoaderStyle !== true && !options.baseConfig)) {
+    // .eslintrc style (baseConfig is flattened)
+    Object.assign(converted, converted.baseConfig);
+    delete converted.baseConfig;
   }
 
   return converted;

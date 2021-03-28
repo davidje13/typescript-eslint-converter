@@ -56,22 +56,20 @@ const typescriptEslintConverter = require('typescript-eslint-converter');
 module.exports = typescriptEslintConverter({
   extends: ['airbnb'], /* or whatever you are using */
 
-  baseConfig: {
-    overrides: [
-      {
-        files: ['*.ts', '*.tsx'],
-        rules: {
-          // examples:
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        // examples:
 
-          // use airbnb quote rules for JS, but backticks for TS:
-          '@typescript-eslint/quotes': ['error', 'backtick'],
+        // use airbnb quote rules for JS, but backticks for TS:
+        '@typescript-eslint/quotes': ['error', 'backtick'],
 
-          // TS-specific rule: enforce Array<T> rather than T[]
-          '@typescript-eslint/array-type': ['error', 'generic'],
-        },
-      }
-    ],
-  },
+        // TS-specific rule: enforce Array<T> rather than T[]
+        '@typescript-eslint/array-type': ['error', 'generic'],
+      },
+    }
+  ],
 });
 ```
 
@@ -89,6 +87,7 @@ module.exports = typescriptEslintConverter({
   typescriptFiles: ['*.ts', '*.tsx'],
   resolveExtensions: ['js', 'mjs', 'jsx', 'mjsx', 'ts', 'tsx'],
   autoParseResolvableExtensions: true,
+  useLoaderStyle: null,
   recommended: true,
   indent: false,
 });
@@ -100,7 +99,12 @@ module.exports = typescriptEslintConverter({
   means matching files will be linted without needing to specify `--ext` on the CLI. If you do not want
   this behaviour, you can set it to `false` (all entries in `typescriptFiles` will continue to be linted
   automatically). Note that this feature only works with ESLint 7+.
-- `recommended` adds `'plugin:@typescript-eslint/recommended'` to the `baseConfig.extends` option.
+- `useLoaderStyle` if `true`, forces `baseConfig`-style configuration (used by the `CLIEngine` API and
+  `eslint-loader`). If `false`, forces flat behaviour (matching `.eslintrc` files). By default, this
+  will automatically detect the presence of `baseConfig` in the input configuration. When using inside
+  a `.eslintrc` file, you should not need to change this. If using in a wrapper project (such as
+  `neutrino`), you may need to set this to `true` to guarantee correct behaviour.
+- `recommended` adds `'plugin:@typescript-eslint/recommended'` to the `extends` option.
   If you do not want this, set it to `false`.
 - `indent` converts any existing `indent` rule to `@typescript-eslint/indent`. This is disabled by
   default due to known issues with `@typescript-eslint/indent`.
