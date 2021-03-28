@@ -156,7 +156,7 @@ These rule changes only apply to `.ts` and `.tsx` source files:
   - `no-empty-function` &rarr; `@typescript-eslint/no-empty-function`
   - `no-extra-parens` &rarr; `@typescript-eslint/no-extra-parens`
   - `no-extra-semi` &rarr; `@typescript-eslint/no-extra-semi`
-  - `no-invalid-this` &rarr; `@typescript-eslint/no-invalid-this`
+  - `no-invalid-this` &amp; `babel/no-invalid-this` &rarr; `@typescript-eslint/no-invalid-this`
   - `no-loop-func` &rarr; `@typescript-eslint/no-loop-func`
   - `no-loss-of-precision` &rarr; `@typescript-eslint/no-loss-of-precision`
   - `no-magic-numbers` &rarr; `@typescript-eslint/no-magic-numbers`
