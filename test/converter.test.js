@@ -1,5 +1,4 @@
 const { CLIEngine } = require('eslint');
-const { it, expect } = require('./framework');
 const typescriptEslintConverter = require('../index');
 
 const BASE_OPTS = {
@@ -19,14 +18,22 @@ function getRuleConfig(options, filename, rule) {
   return Array.isArray(r) ? r : [r];
 }
 
+const containsMatching = (fn) => (actual) => {
+  if (actual.some(fn)) {
+		return { pass: true, message: `Expected not to contain element matching ${fn}, but got ${actual}.` };
+  } else {
+		return { pass: false, message: `Expected to contain element matching ${fn}, but got ${actual}.` };
+  }
+};
+
 it('sets the parser', () => {
   const converted = typescriptEslintConverter(BASE_OPTS);
-  expect.equal(converted.parser, '@typescript-eslint/parser');
+  expect(converted.parser).toEqual('@typescript-eslint/parser');
 });
 
 it('sets the parser project by default', () => {
   const converted = typescriptEslintConverter(BASE_OPTS);
-  expect.equal(converted.parserOptions.project, './tsconfig.json');
+  expect(converted.parserOptions.project).toEqual('./tsconfig.json');
 });
 
 it('allows overriding the parser project', () => {
@@ -36,44 +43,44 @@ it('allows overriding the parser project', () => {
       project: 'something',
     },
   });
-  expect.equal(converted.parserOptions.project, 'something');
+  expect(converted.parserOptions.project).toEqual('something');
 });
 
 it('adds typescript-eslint/recommended', () => {
   const converted = typescriptEslintConverter(BASE_OPTS);
-  expect.equal(converted.baseConfig.extends, [
+  expect(converted.baseConfig.extends).toEqual([
     'plugin:@typescript-eslint/recommended',
   ]);
-  expect.equal(converted.extends, undefined);
+  expect(converted.extends).toEqual(undefined);
 });
 
 it('does not use baseConfig if not passed in', () => {
   const converted = typescriptEslintConverter({ parser: 'espree' });
-  expect.equal(converted.extends, [
+  expect(converted.extends).toEqual([
     'plugin:@typescript-eslint/recommended',
   ]);
-  expect.equal(converted.baseConfig, undefined);
+  expect(converted.baseConfig).toEqual(undefined);
 });
 
 it('does not use baseConfig if forced', () => {
   const converted = typescriptEslintConverter(BASE_OPTS, { useLoaderStyle: false });
-  expect.equal(converted.extends, [
+  expect(converted.extends).toEqual([
     'plugin:@typescript-eslint/recommended',
   ]);
-  expect.equal(converted.baseConfig, undefined);
+  expect(converted.baseConfig).toEqual(undefined);
 });
 
 it('does use baseConfig if forced', () => {
   const converted = typescriptEslintConverter({ parser: 'espree' }, { useLoaderStyle: true });
-  expect.equal(converted.baseConfig.extends, [
+  expect(converted.baseConfig.extends).toEqual([
     'plugin:@typescript-eslint/recommended',
   ]);
-  expect.equal(converted.extends, undefined);
+  expect(converted.extends).toEqual(undefined);
 });
 
 it('does not add typescript-eslint/recommended if recommended is false', () => {
   const converted = typescriptEslintConverter(BASE_OPTS, { recommended: false });
-  expect.equal(converted.baseConfig.extends, []);
+  expect(converted.baseConfig.extends).toEqual([]);
 });
 
 it('preserves existing config extensions', () => {
@@ -83,7 +90,7 @@ it('preserves existing config extensions', () => {
       extends: ['eslint:recommended'],
     },
   });
-  expect.equal(converted.baseConfig.extends, [
+  expect(converted.baseConfig.extends).toEqual([
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
   ]);
@@ -93,7 +100,9 @@ it('configures import/resolver', () => {
   const converted = typescriptEslintConverter(BASE_OPTS);
 
   const resolver = converted.baseConfig.settings['import/resolver'];
-  expect.containsAll(resolver.node.extensions, ['.js', '.ts', '.tsx']);
+  expect(resolver.node.extensions).contains('.js');
+  expect(resolver.node.extensions).contains('.ts');
+  expect(resolver.node.extensions).contains('.tsx');
 });
 
 it('uses configurable extensions for import/resolver', () => {
@@ -102,24 +111,22 @@ it('uses configurable extensions for import/resolver', () => {
   });
 
   const resolver = converted.baseConfig.settings['import/resolver'];
-  expect.containsAll(resolver.node.extensions, ['.woo']);
+  expect(resolver.node.extensions).contains('.woo');
 });
 
 it('creates overrides for typescript files', () => {
   const converted = typescriptEslintConverter(BASE_OPTS);
 
   const overrides = converted.baseConfig.overrides;
-  expect.containsAll(overrides, [
-    (o) => o.files.includes('*.ts'),
-    (o) => o.files.includes('*.tsx'),
-  ]);
+  expect(overrides, containsMatching((o) => o.files.includes('*.ts')));
+  expect(overrides, containsMatching((o) => o.files.includes('*.tsx')));
 });
 
 it('creates overrides for other known files by default', () => {
   const converted = typescriptEslintConverter(BASE_OPTS);
 
   const overrides = converted.baseConfig.overrides;
-  expect.contains(overrides, (o) => o.files.includes('*.js'));
+  expect(overrides, containsMatching((o) => o.files.includes('*.js')));
 });
 
 it('does not create overrides for other files if autoParseResolvableExtensions = false', () => {
@@ -128,7 +135,7 @@ it('does not create overrides for other files if autoParseResolvableExtensions =
   });
 
   const overrides = converted.baseConfig.overrides;
-  expect.not.contains(overrides, (o) => o.files.includes('*.js'));
+  expect(overrides).not(containsMatching((o) => o.files.includes('*.js')));
 });
 
 it('leaves rules unconfigured if not specified in base config', () => {
@@ -136,7 +143,7 @@ it('leaves rules unconfigured if not specified in base config', () => {
 
   const rule = getRuleConfig(converted, 'foo.js', 'react/jsx-filename-extension');
 
-  expect.equal(rule, []);
+  expect(rule).toEqual([]);
 });
 
 it('configures react/jsx-filename-extension', () => {
@@ -155,7 +162,7 @@ it('configures react/jsx-filename-extension', () => {
   });
 
   const rule = getRuleConfig(converted, 'foo.js', 'react/jsx-filename-extension');
-  expect.equal(rule, ['warn', {
+  expect(rule).toEqual(['warn', {
     foo: 'bar',
     extensions: [...inputExtensions, '.tsw'],
   }]);
@@ -177,7 +184,7 @@ it('configures import/no-extraneous-dependencies', () => {
   });
 
   const rule = getRuleConfig(converted, 'foo.js', 'import/no-extraneous-dependencies');
-  expect.equal(rule, ['warn', {
+  expect(rule).toEqual(['warn', {
     foo: 'bar',
     optionalDependencies: ['**/*.{js,ts}'],
     peerDependencies: ['**/*.foo.{jsx,tsx}', '**/*.spec.{js,ts}'],
@@ -200,7 +207,7 @@ it('configures import/extensions', () => {
   });
 
   const rule = getRuleConfig(converted, 'foo.js', 'import/extensions');
-  expect.equal(rule, ['warn', {
+  expect(rule).toEqual(['warn', {
     foo: 'never',
     js: 'never',
     jsx: 'always',
@@ -221,16 +228,16 @@ it('disables rules checked by the compiler for ts files', () => {
     },
   });
 
-  expect.equal(getRuleConfig(converted, 'foo.js', 'getter-return'), ['warn']);
-  expect.equal(getRuleConfig(converted, 'foo.jsx', 'getter-return'), ['warn']);
-  expect.equal(getRuleConfig(converted, 'foo.ts', 'getter-return'), ['off']);
-  expect.equal(getRuleConfig(converted, 'foo.tsx', 'getter-return'), ['off']);
+  expect(getRuleConfig(converted, 'foo.js', 'getter-return')).toEqual(['warn']);
+  expect(getRuleConfig(converted, 'foo.jsx', 'getter-return')).toEqual(['warn']);
+  expect(getRuleConfig(converted, 'foo.ts', 'getter-return')).toEqual(['off']);
+  expect(getRuleConfig(converted, 'foo.tsx', 'getter-return')).toEqual(['off']);
 
-  expect.equal(getRuleConfig(converted, 'foo.js', 'no-undef'), ['error']);
-  expect.equal(getRuleConfig(converted, 'foo.ts', 'no-undef'), ['off']);
+  expect(getRuleConfig(converted, 'foo.js', 'no-undef')).toEqual(['error']);
+  expect(getRuleConfig(converted, 'foo.ts', 'no-undef')).toEqual(['off']);
 
-  expect.equal(getRuleConfig(converted, 'foo.js', 'no-const-assign'), ['off']);
-  expect.equal(getRuleConfig(converted, 'foo.ts', 'no-const-assign'), ['off']);
+  expect(getRuleConfig(converted, 'foo.js', 'no-const-assign')).toEqual(['off']);
+  expect(getRuleConfig(converted, 'foo.ts', 'no-const-assign')).toEqual(['off']);
 });
 
 it('translates rules with typescript alternatives', () => {
@@ -244,13 +251,13 @@ it('translates rules with typescript alternatives', () => {
     },
   });
 
-  expect.equal(getRuleConfig(converted, 'foo.js', 'brace-style'), ['warn', 'stroustrup']);
-  expect.equal(getRuleConfig(converted, 'foo.ts', 'brace-style')[0], 'off');
-  expect.equal(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/brace-style'), ['warn', 'stroustrup']);
+  expect(getRuleConfig(converted, 'foo.js', 'brace-style')).toEqual(['warn', 'stroustrup']);
+  expect(getRuleConfig(converted, 'foo.ts', 'brace-style')[0]).toEqual('off');
+  expect(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/brace-style')).toEqual(['warn', 'stroustrup']);
 
-  expect.equal(getRuleConfig(converted, 'foo.js', 'no-dupe-class-members'), ['error']);
-  expect.equal(getRuleConfig(converted, 'foo.ts', 'no-dupe-class-members')[0], 'off');
-  expect.equal(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/no-dupe-class-members'), ['error']);
+  expect(getRuleConfig(converted, 'foo.js', 'no-dupe-class-members')).toEqual(['error']);
+  expect(getRuleConfig(converted, 'foo.ts', 'no-dupe-class-members')[0]).toEqual('off');
+  expect(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/no-dupe-class-members')).toEqual(['error']);
 });
 
 it('leaves typescript rules unchanged if configured', () => {
@@ -264,9 +271,9 @@ it('leaves typescript rules unchanged if configured', () => {
     },
   });
 
-  expect.equal(getRuleConfig(converted, 'foo.js', 'brace-style'), ['warn', 'stroustrup']);
-  expect.equal(getRuleConfig(converted, 'foo.ts', 'brace-style')[0], 'off');
-  expect.equal(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/brace-style'), ['error']);
+  expect(getRuleConfig(converted, 'foo.js', 'brace-style')).toEqual(['warn', 'stroustrup']);
+  expect(getRuleConfig(converted, 'foo.ts', 'brace-style')[0]).toEqual('off');
+  expect(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/brace-style')).toEqual(['error']);
 });
 
 it('disables indent by default', () => {
@@ -279,11 +286,11 @@ it('disables indent by default', () => {
     },
   });
 
-  expect.equal(getRuleConfig(converted, 'foo.js', 'indent'), ['error', 2]);
-  expect.equal(getRuleConfig(converted, 'foo.js', '@typescript-eslint/indent'), []);
+  expect(getRuleConfig(converted, 'foo.js', 'indent')).toEqual(['error', 2]);
+  expect(getRuleConfig(converted, 'foo.js', '@typescript-eslint/indent')).toEqual([]);
 
-  expect.equal(getRuleConfig(converted, 'foo.ts', 'indent')[0], 'off');
-  expect.equal(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/indent'), []);
+  expect(getRuleConfig(converted, 'foo.ts', 'indent')[0]).toEqual('off');
+  expect(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/indent')).toEqual([]);
 });
 
 it('preserves existing @typescript-eslint/indent config', () => {
@@ -297,8 +304,8 @@ it('preserves existing @typescript-eslint/indent config', () => {
     },
   });
 
-  expect.equal(getRuleConfig(converted, 'foo.ts', 'indent')[0], 'off');
-  expect.equal(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/indent'), ['warn', 4]);
+  expect(getRuleConfig(converted, 'foo.ts', 'indent')[0]).toEqual('off');
+  expect(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/indent')).toEqual(['warn', 4]);
 });
 
 it('converts indent if requested', () => {
@@ -311,19 +318,19 @@ it('converts indent if requested', () => {
     },
   }, { indent: true });
 
-  expect.equal(getRuleConfig(converted, 'foo.js', 'indent'), ['error', 2]);
-  expect.equal(getRuleConfig(converted, 'foo.js', '@typescript-eslint/indent'), []);
+  expect(getRuleConfig(converted, 'foo.js', 'indent')).toEqual(['error', 2]);
+  expect(getRuleConfig(converted, 'foo.js', '@typescript-eslint/indent')).toEqual([]);
 
-  expect.equal(getRuleConfig(converted, 'foo.ts', 'indent')[0], 'off');
-  expect.equal(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/indent'), ['error', 2]);
+  expect(getRuleConfig(converted, 'foo.ts', 'indent')[0]).toEqual('off');
+  expect(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/indent')).toEqual(['error', 2]);
 });
 
 it('does not convert indent if not specified', () => {
   const converted = typescriptEslintConverter(BASE_OPTS, { indent: true });
 
-  expect.equal(getRuleConfig(converted, 'foo.js', 'indent'), []);
-  expect.equal(getRuleConfig(converted, 'foo.js', '@typescript-eslint/indent'), []);
+  expect(getRuleConfig(converted, 'foo.js', 'indent')).toEqual([]);
+  expect(getRuleConfig(converted, 'foo.js', '@typescript-eslint/indent')).toEqual([]);
 
-  expect.equal(getRuleConfig(converted, 'foo.ts', 'indent'), []);
-  expect.equal(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/indent'), []);
+  expect(getRuleConfig(converted, 'foo.ts', 'indent')).toEqual([]);
+  expect(getRuleConfig(converted, 'foo.ts', '@typescript-eslint/indent')).toEqual([]);
 });
